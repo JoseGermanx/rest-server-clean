@@ -1,9 +1,10 @@
-import { Request, Response, RequestHandler  } from "express";
-import { RegisterUserDto } from "../../domain";
+import { Request, Response, RequestHandler  } from 'express';
+import { AuthRepository, RegisterUserDto } from "../../domain";
 
 
 export class AuthController {
-    constructor() {
+    constructor(private readonly authRepository: AuthRepository) {
+        
     }
     
     registerUser: RequestHandler  = (req: Request, res: Response): void => {
@@ -15,7 +16,13 @@ export class AuthController {
             return;
         };
 
-        res.json(registerUserDto);
+        this.authRepository.register(registerUserDto!)
+            .then((user) => {
+                res.status(201).json(user);
+            })
+            .catch((error) => {
+                res.status(500).json({ error });
+            });
     }
 
     loginUser:RequestHandler  = (req: Request, res: Response) => {
