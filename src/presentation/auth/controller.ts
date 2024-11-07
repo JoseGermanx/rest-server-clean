@@ -1,7 +1,8 @@
 import { Request, Response, RequestHandler  } from 'express';
-import { AuthRepository, CustomError, RegisterUser, RegisterUserDto } from "../../domain";
+import { AuthRepository, CustomError, RegisterUser, RegisterUserDto, LoginUserDto } from "../../domain";
 import { JwtAdapter } from '../../config';
 import { UserModel } from '../../data/mongodb';
+import { LoginUser } from '../../domain/use-cases/auth/login-user.use-case';
 
 
 export class AuthController {
@@ -35,8 +36,19 @@ export class AuthController {
 
     }
 
-    loginUser:RequestHandler  = (req: Request, res: Response) => {
-        res.json({ message: 'login' });
+    loginUser:RequestHandler  = (req: Request, res: Response): void => {
+
+        const [error, loginUserDto] = LoginUserDto.create(req.body);
+
+        if (error){
+            res.status(400).json({ error });
+            return;
+        };
+
+        new LoginUser(this.authRepository, JwtAdapter.generateToken)
+        .execute(loginUserDto!)
+        .then(data => res.json(data))
+        .catch(error => this.handleError(error, res));
     }
 
     getUsers: RequestHandler = async (req: Request, res: Response )  => {
