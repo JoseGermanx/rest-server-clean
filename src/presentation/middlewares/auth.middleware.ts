@@ -3,6 +3,8 @@ import { JwtAdapter } from "../../config";
 import { UserModel } from "../../data/mongodb";
 import { CustomError } from "../../domain";
 
+
+
 export class AuthMiddleware {
 
   static validateJWT = async (req: Request, res: Response, next: NextFunction) => {
@@ -21,17 +23,24 @@ export class AuthMiddleware {
 
       // // todo:
       const payload = await JwtAdapter.validateToken(token);
-      if ( !payload ) throw new CustomError(401, 'Invalid token');
 
-      // // const user = await UserModel.findById(payload.id);
-      // // if ( !user ) return res.status(401).json({ error: 'Invalid token - user not found' })
-
-
-      // req.body.payload = payload;
-
-      console.log("Pasando por el middle")
       console.log(payload);
 
+      if ( !payload ) throw new CustomError(401, 'Invalid token');
+
+      if (typeof payload !== 'object') throw new CustomError(401, 'Invalid token - object');
+
+      if (!payload.hasOwnProperty('id')) throw new CustomError(401, 'Invalid token - id');
+
+      
+      const user = await UserModel.findById(payload.id);
+      if ( !user ) throw new CustomError(401, 'Invalid token');
+
+
+      req.body.payload = payload;
+
+      console.log(user)
+      
       next();
     } catch (error) {
       if (error instanceof CustomError) {

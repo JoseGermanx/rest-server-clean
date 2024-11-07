@@ -3,7 +3,11 @@ import { envs } from './envs';
 
 
 // const JWT_SEED = envs.JWT_SEED;
-
+interface Payload {
+  id: string;
+  ia: string;
+  exp: number;
+}
 
 export class JwtAdapter {
 
@@ -28,7 +32,7 @@ export class JwtAdapter {
   }
 
 
-  static validateToken( token: string ) {
+  static validateToken( token: string ): Promise<Payload|null> {
 
     return new Promise( (resolve) => {
 
@@ -36,7 +40,7 @@ export class JwtAdapter {
 
         if ( err ) return resolve(null);
 
-        resolve(decoded);
+        resolve(decoded as Payload);
 
       });
 
