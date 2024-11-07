@@ -36,13 +36,14 @@ export class AuthController {
         res.json({ message: 'login' });
     }
 
-    public getUsers: RequestHandler = async (req: Request, res: Response ):  Promise<void>  => {
+    getUsers: RequestHandler = async (req: Request, res: Response )  => {
     
        await  UserModel.find()
           .then( users => {
             res.json({
               users,
             //   user: req.body.user
+            token: req.body.payload
             }) 
           })
           .catch(()=> res.status(500).json({ error: 'Internal server error' }))

@@ -28,7 +28,7 @@ export class JwtAdapter {
   }
 
 
-  static validateToken<T>( token: string ): Promise<T | null> {
+  static validateToken( token: string ) {
 
     return new Promise( (resolve) => {
 
@@ -36,7 +36,7 @@ export class JwtAdapter {
 
         if ( err ) return resolve(null);
 
-        resolve(decoded as T);
+        resolve(decoded);
 
       });
 

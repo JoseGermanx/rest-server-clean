@@ -12,6 +12,14 @@ export class AuthRepositoryImpl implements AuthRepository {
       return this.authDatasource.register(registerUserDto);
     }
 
+    login(): Promise<UserEntity> {
+      throw new Error("Method not implemented.");
+    }
+
+    getUsers(): Promise<UserEntity[]> {
+      throw new Error("Method not implemented.");
+    }
+
 
 
     
