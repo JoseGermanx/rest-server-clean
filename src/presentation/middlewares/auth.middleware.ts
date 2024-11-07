@@ -18,11 +18,7 @@ export class AuthMiddleware {
 
       const token = authorization.split(' ').at(1) || '';
       
-
-
-
-      // // todo:
-      const payload = await JwtAdapter.validateToken(token);
+      const payload = await JwtAdapter.validateToken<{id: string}>(token);
 
       console.log(payload);
 
@@ -34,12 +30,9 @@ export class AuthMiddleware {
 
       
       const user = await UserModel.findById(payload.id);
-      if ( !user ) throw new CustomError(401, 'Invalid token');
-
+      if ( !user ) throw new CustomError(401, 'Invalid user');
 
       req.body.payload = payload;
-
-      console.log(user)
       
       next();
     } catch (error) {

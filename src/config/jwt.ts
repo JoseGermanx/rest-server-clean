@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { envs } from './envs';
 
-
-// const JWT_SEED = envs.JWT_SEED;
+const JWT_SEED = envs.JWT_SEED;
 interface Payload {
   id: string;
   ia: string;
@@ -18,7 +17,7 @@ export class JwtAdapter {
     return new Promise( ( resolve ) => {
 
       // todo: generación del seed
-      jwt.sign( payload, "JWT_SEED", { expiresIn: duration }, (err, token) => {
+      jwt.sign( payload, JWT_SEED, { expiresIn: duration }, (err, token) => {
 
         if ( err ) return resolve(null);
 
@@ -32,15 +31,15 @@ export class JwtAdapter {
   }
 
 
-  static validateToken( token: string ): Promise<Payload|null> {
+  static validateToken<T>( token: string ): Promise<T|null> {
 
     return new Promise( (resolve) => {
 
-      jwt.verify( token, "JWT_SEED", (err, decoded) => {
+      jwt.verify( token, JWT_SEED, (err, decoded) => {
 
         if ( err ) return resolve(null);
 
-        resolve(decoded as Payload);
+        resolve(decoded as T);
 
       });
 
