@@ -3,6 +3,8 @@ import { AuthRepository, CustomError, RegisterUser, RegisterUserDto, LoginUserDt
 import { JwtAdapter } from '../../config';
 import { UserModel } from '../../data/mongodb';
 import { LoginUser } from '../../domain/use-cases/auth/login-user.use-case';
+import { PassChangeDto } from '../../domain/dtos/auth/password-change.dtos';
+import { PasswordChange } from '../../domain/use-cases/auth/password-change.use-case';
 
 
 export class AuthController {
@@ -48,6 +50,20 @@ export class AuthController {
         new LoginUser(this.authRepository, JwtAdapter.generateToken)
         .execute(loginUserDto!)
         .then(data => res.json(data))
+        .catch(error => this.handleError(error, res));
+    }
+
+    changePassword: RequestHandler = (req: Request, res: Response): void => {
+        const [error, passwordChangeDto] = PassChangeDto.create(req.body);
+
+        if (error){
+            res.status(400).json({ error });
+            return;
+        };
+
+        new PasswordChange(this.authRepository)
+        .execute(passwordChangeDto!)
+        .then(() => res.json({ message: 'Password changed' }))
         .catch(error => this.handleError(error, res));
     }
 

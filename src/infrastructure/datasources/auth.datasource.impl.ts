@@ -1,6 +1,7 @@
 import { BcryptAdapter } from "../../config";
 import { UserModel } from "../../data/mongodb";
 import { AuthDatasource, CustomError, RegisterUserDto, LoginUserDto, UserEntity } from "../../domain";
+import { PassChangeDto } from "../../domain/dtos/auth/password-change.dtos";
 import { UserMapper } from "../mappers/user-mapper";
 
 
@@ -86,6 +87,35 @@ export class AuthDatasourceImpl implements AuthDatasource {
         }
 
 
+    }
+
+    async changePassword(passwordChangeDto: PassChangeDto): Promise<void> {
+        const { email, oldPassword, newPassword } = passwordChangeDto;
+
+        try {
+
+            const user = await UserModel.findOne({  email });
+
+            if (!user) {
+                throw CustomError.badRequest('User not found');
+            }
+
+            const isValidPassword = this.comparePassword(oldPassword, user.password!);
+
+            if (!isValidPassword) {
+                throw CustomError.badRequest('Invalid password');
+            }
+
+            user.password = this.hashPassword(newPassword);
+            await user.save();
+
+        } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
+
+            throw CustomError.internalServer();
+        }
     }
 
 }

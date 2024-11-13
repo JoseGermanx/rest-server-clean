@@ -1,4 +1,5 @@
 import { AuthDatasource, AuthRepository, LoginUserDto, RegisterUserDto, UserEntity } from "../../domain";
+import { PassChangeDto } from "../../domain/dtos/auth/password-change.dtos";
 
 
 export class AuthRepositoryImpl implements AuthRepository {
@@ -15,6 +16,10 @@ export class AuthRepositoryImpl implements AuthRepository {
     login(loginUserDto: LoginUserDto): Promise<UserEntity> {
       return this.authDatasource.login(loginUserDto);
 
+    }
+
+    changePassword(passwordChangeDto: PassChangeDto): Promise<void> {
+      return this.authDatasource.changePassword(passwordChangeDto);
     }
 
     getUsers(): Promise<UserEntity[]> {

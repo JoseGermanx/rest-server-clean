@@ -1,8 +1,4 @@
 
-
-
-// data transfer object for password change
-
 import { Validators } from "../../../config";
 
 export class PassChangeDto {
