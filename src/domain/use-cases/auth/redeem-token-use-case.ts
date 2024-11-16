@@ -19,9 +19,11 @@ export class RedeemToken implements RedeemTokenUseCase {
             try {
                 await this.authRepository.redemptionToken(resetTokenDto)
             } catch (error) {
-                throw new CustomError(500, "Internal server error");
-    
-            }
 
+                if (error instanceof CustomError) {
+                    throw new CustomError(error.statusCode, error.message);
+                }
+                throw new Error
+            }
         }
     }

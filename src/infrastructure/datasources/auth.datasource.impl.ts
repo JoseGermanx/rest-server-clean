@@ -172,8 +172,17 @@ export class AuthDatasourceImpl implements AuthDatasource {
 
         try {
 
-            const user = await UserModel.findById(userId)
+            const userTokenRedeem = await TokenResetModel.findOne({
+                token,
+                idUser: userId
+            });
             
+            if (!userTokenRedeem) {
+                throw CustomError.badRequest('User Token not found');
+            }
+
+            const user = await UserModel.findById(userId);
+
             if (!user) {
                 throw CustomError.badRequest('User not found');
             }
@@ -181,14 +190,15 @@ export class AuthDatasourceImpl implements AuthDatasource {
             user.password = this.hashPassword(password);
             await user.save();
 
+            await TokenResetModel.deleteMany({ idUser: userId });
+
+            console.log("Transaction ok: ", user);
+
         } catch (error) {
                 
                 if (error instanceof CustomError) {
-                    console.log("error en redemptionToken CUstom: ", error);
                     throw error;
                 }
-
-                console.log("error en redemptionToken: ", error);
     
                 throw CustomError.internalServer();
         }   

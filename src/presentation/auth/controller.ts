@@ -97,7 +97,6 @@ export class AuthController {
         .execute(resetTokenDto!)
         .then(() => res.json({ message: 'Password changed' }))
         .catch(error => {
-            console.log(error);
             this.handleError(error, res)
         });
     }
