@@ -142,12 +142,9 @@ export class AuthDatasourceImpl implements AuthDatasource {
 
             await newResetToken.save();
 
-            console.log("trasacción en model token ok : ",newResetToken);
-            
-            const url = `http://localhost:3000/reset-password?token=${token}`;
-
-            // sent email with new password
-
+             // sent email with new password
+            const url = `http://localhost:3021/reset-password?token=${token}`;
+            console.log("URL: ", url)
         } catch (error) {
 
             if (error instanceof CustomError) {

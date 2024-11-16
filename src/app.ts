@@ -18,7 +18,8 @@ async function main() {
   
     new Server({
         port : envs.PORT,
-        routes: AppRoutes.routes
+        routes: AppRoutes.routes,
+        publicRoutes: AppRoutes.publicRoutes
 
     }).start()
 }
