@@ -1,7 +1,9 @@
-import { BcryptAdapter } from "../../config";
+import { BcryptAdapter, JwtAdapter } from "../../config";
 import { UserModel } from "../../data/mongodb";
-import { AuthDatasource, CustomError, RegisterUserDto, LoginUserDto, UserEntity } from "../../domain";
+import { TokenResetModel } from "../../data/mongodb/models/token-reset.model";
+import { AuthDatasource, CustomError, RegisterUserDto, LoginUserDto, UserEntity, PassLoseDto } from "../../domain";
 import { PassChangeDto } from "../../domain/dtos/auth/password-change.dtos";
+import { ResetTokenDto } from "../../domain/dtos/auth/reset-token.dtos";
 import { UserMapper } from "../mappers/user-mapper";
 
 
@@ -116,6 +118,81 @@ export class AuthDatasourceImpl implements AuthDatasource {
 
             throw CustomError.internalServer();
         }
+    }
+
+    async losePassword(passWordLoseDto: PassLoseDto): Promise<void> {
+        const { email } = passWordLoseDto;
+
+        try {
+
+            const user = await UserModel.findOne({ email });
+
+            if (!user) {
+                throw CustomError.badRequest('User not found');
+            }
+
+            const idUser = user._id;
+
+            const token = await JwtAdapter.generateToken({idUser}, '1h');
+
+            const newResetToken = await TokenResetModel.create({
+                token,
+                idUser: user.id
+            });
+
+            await newResetToken.save();
+
+            console.log("trasacción en model token ok : ",newResetToken);
+            
+            const url = `http://localhost:3000/reset-password?token=${token}`;
+
+            // sent email with new password
+
+        } catch (error) {
+
+            if (error instanceof CustomError) {
+                throw error;
+            }
+
+            throw CustomError.internalServer();
+        }
+
+    }
+
+    async redemptionToken(resetTokenDto: ResetTokenDto): Promise<void> {
+        const { token, password } = resetTokenDto;
+
+        const validateToken: {idUser: string} | null = await JwtAdapter.validateToken(token);
+
+        if (!validateToken) {
+            throw CustomError.badRequest('Invalid token');
+        }
+
+        const userId = validateToken.idUser;
+
+        try {
+
+            const user = await UserModel.findById(userId)
+            
+            if (!user) {
+                throw CustomError.badRequest('User not found');
+            }
+
+            user.password = this.hashPassword(password);
+            await user.save();
+
+        } catch (error) {
+                
+                if (error instanceof CustomError) {
+                    console.log("error en redemptionToken CUstom: ", error);
+                    throw error;
+                }
+
+                console.log("error en redemptionToken: ", error);
+    
+                throw CustomError.internalServer();
+        }   
+
     }
 
 }

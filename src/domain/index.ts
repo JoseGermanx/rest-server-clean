@@ -6,6 +6,10 @@ export * from './dtos/auth/register-user.dtos';
 
 export * from './dtos/auth/login-user.dtos';
 
+export * from './dtos/auth/password-change.dtos';
+
+export * from './dtos/auth/password-lose.dtos';
+
 export * from './errors/custom.error';
 
 export * from './datasources/auth.datasource';

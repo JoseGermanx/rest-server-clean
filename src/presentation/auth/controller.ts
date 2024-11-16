@@ -1,10 +1,13 @@
 import { Request, Response, RequestHandler  } from 'express';
-import { AuthRepository, CustomError, RegisterUser, RegisterUserDto, LoginUserDto } from "../../domain";
+import { AuthRepository, CustomError, RegisterUser, RegisterUserDto, LoginUserDto, PassLoseDto } from "../../domain";
 import { JwtAdapter } from '../../config';
 import { UserModel } from '../../data/mongodb';
 import { LoginUser } from '../../domain/use-cases/auth/login-user.use-case';
 import { PassChangeDto } from '../../domain/dtos/auth/password-change.dtos';
 import { PasswordChange } from '../../domain/use-cases/auth/password-change.use-case';
+import { PasswordLost } from '../../domain/use-cases/auth/password-lost.use-case';
+import { ResetTokenDto } from '../../domain/dtos/auth/reset-token.dtos';
+import { RedeemToken } from '../../domain/use-cases/auth/redeem-token-use-case';
 
 
 export class AuthController {
@@ -65,6 +68,38 @@ export class AuthController {
         .execute(passwordChangeDto!)
         .then(() => res.json({ message: 'Password changed' }))
         .catch(error => this.handleError(error, res));
+    }
+
+    losePassword: RequestHandler = (req: Request, res: Response): void => {
+        const [ error, passWordLoseDto ] = PassLoseDto.create(req.body);
+
+        if (error){
+            res.status(400).json({ error });
+            return;
+        };
+
+        new PasswordLost(this.authRepository)
+        .execute(passWordLoseDto!)
+        .then(() => res.json({ message: 'Redemption Token Created' }))
+        .catch(error => this.handleError(error, res));
+
+    }
+
+    redeemToken: RequestHandler = (req: Request, res: Response): void => {
+        const [ error, resetTokenDto ] = ResetTokenDto.create(req.body);
+
+        if (error){
+            res.status(400).json({ error });
+            return;
+        };
+
+        new RedeemToken(this.authRepository)
+        .execute(resetTokenDto!)
+        .then(() => res.json({ message: 'Password changed' }))
+        .catch(error => {
+            console.log(error);
+            this.handleError(error, res)
+        });
     }
 
     getUsers: RequestHandler = async (req: Request, res: Response )  => {
