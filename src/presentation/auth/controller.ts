@@ -86,7 +86,12 @@ export class AuthController {
     }
 
     redeemToken: RequestHandler = (req: Request, res: Response): void => {
-        const [ error, resetTokenDto ] = ResetTokenDto.create(req.body);
+
+        const data = {
+            token: req.query.token,
+            password: req.body.password
+        }
+        const [ error, resetTokenDto ] = ResetTokenDto.create(data);
 
         if (error){
             res.status(400).json({ error });

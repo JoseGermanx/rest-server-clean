@@ -143,7 +143,7 @@ export class AuthDatasourceImpl implements AuthDatasource {
             await newResetToken.save();
 
              // sent email with new password
-            const url = `http://localhost:3021/reset-password?token=${token}`;
+            const url = `http://172.31.142.203:5173/change-password?token=${token}`;
             console.log("URL: ", url)
         } catch (error) {
 
