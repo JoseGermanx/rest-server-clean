@@ -189,8 +189,6 @@ export class AuthDatasourceImpl implements AuthDatasource {
 
             await TokenResetModel.deleteMany({ idUser: userId });
 
-            console.log("Transaction ok: ", user);
-
         } catch (error) {
                 
                 if (error instanceof CustomError) {
